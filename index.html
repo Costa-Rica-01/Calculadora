@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calculadora Neon - Erick Programer</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{
+    background:#0a0c14;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    min-height:100vh;
+    font-family: sans-serif;
+  }
+  .calc-box{
+    width:320px;
+    background: linear-gradient(145deg, #2f3244, #1e2030);
+    border-radius:36px;
+    padding:20px;
+    border:1.5px solid transparent;
+    background-clip: padding-box;
+    position:relative;
+    box-shadow: 0 0 0 1.5px rgba(168,85,247,0.4), 0 0 0 1.5px rgba(6,182,212,0.4) inset,
+                0 0 35px rgba(168,85,247,0.35), 0 0 35px rgba(6,182,212,0.25),
+                inset 0 1px 1px rgba(255,255,255,0.15);
+  }
+  .calc-box::before{
+    content:'';
+    position:absolute;
+    inset:-1.5px;
+    border-radius:36px;
+    background: linear-gradient(135deg, #c084fc, #22d3ee);
+    z-index:-1;
+    filter: blur(1px);
+  }
+  .calc-display{
+    background: #12141f;
+    border-radius:24px;
+    padding:22px 22px;
+    margin-bottom:18px;
+    text-align:right;
+    min-height:70px;
+    display:flex;
+    justify-content:flex-end;
+    align-items:center;
+    box-shadow: inset 0 5px 15px rgba(0,0,0,0.6);
+    border:1px solid rgba(255,255,255,0.05);
+  }
+  #calc-result{
+    color:#a7f3d0;
+    font-size:34px;
+    font-family: 'Courier New', monospace;
+    letter-spacing:1px;
+    text-shadow: 0 0 12px rgba(94,234,212,0.8);
+    word-break: break-all;
+    line-height:1;
+  }
+  .calc-grid{
+    display:grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap:14px;
+  }
+  .calc-btn{
+    height:66px;
+    border-radius:20px;
+    border:none;
+    font-size:23px;
+    font-weight:500;
+    cursor:pointer;
+    background: linear-gradient(145deg, #51586f, #383c51);
+    color:#f1f5f9;
+    box-shadow: 0 5px 0 #1e2030, 0 8px 18px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.25);
+    transition: all 0.08s ease;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .calc-btn:active{
+    transform: translateY(4px);
+    box-shadow: 0 1px 0 #1e2030, inset 0 1px 0 rgba(255,255,255,0.2);
+  }
+  .btn-purple{
+    background: linear-gradient(145deg, #9a4aa8, #5b2d7a);
+    color:#f0abfc;
+    border:1px solid rgba(240,171,252,0.35);
+    box-shadow: 0 5px 0 #3a1a4a, 0 0 18px rgba(240,171,252,0.35);
+  }
+  .btn-cyan{
+    background: linear-gradient(145deg, #2f5366, #234455);
+    color:#22d3ee;
+    border:1px solid rgba(34,211,238,0.25);
+  }
+  .btn-operator{ background: linear-gradient(145deg, #2a5f6e, #1e4b5a); color:#22d3ee; }
+  .btn-plus{ background: linear-gradient(145deg, #2a6a7a, #1e5566); color:#22d3ee; }
+  .btn-equal{
+    background: linear-gradient(180deg, #38e8ff, #0ea5e9);
+    color:white;
+    font-size:30px;
+    box-shadow: 0 5px 0 #0c7abf, 0 0 28px rgba(56,232,255,0.9), inset 0 1px 0 rgba(255,255,255,0.6);
+  }
+  .btn-zero{ grid-column: span 2; }
+</style>
+</head>
+<body>
+
+<div class="calc-box">
+  <div class="calc-display"><div id="calc-result"></div></div>
+  
+  <div class="calc-grid">
+    <button class="calc-btn btn-purple" onclick="ac()">AC</button>
+    <button class="calc-btn btn-purple" onclick="del()">DEL</button>
+    <button class="calc-btn btn-cyan" onclick="add('%')">%</button>
+    <button class="calc-btn btn-cyan" onclick="add('/')">/</button>
+
+    <button class="calc-btn" onclick="add('7')">7</button>
+    <button class="calc-btn" onclick="add('8')">8</button>
+    <button class="calc-btn" onclick="add('9')">9</button>
+    <button class="calc-btn btn-operator" onclick="add('')"></button>
+
+    <button class="calc-btn" onclick="add('4')">4</button>
+    <button class="calc-btn" onclick="add('5')">5</button>
+    <button class="calc-btn" onclick="add('6')">6</button>
+    <button class="calc-btn btn-operator" onclick="add('-')">-</button>
+
+    <button class="calc-btn" onclick="add('1')">1</button>
+    <button class="calc-btn" onclick="add('2')">2</button>
+    <button class="calc-btn" onclick="add('3')">3</button>
+    <button class="calc-btn btn-plus" onclick="add('+')">+</button>
+
+    <button class="calc-btn btn-zero" onclick="add('0')">0</button>
+    <button class="calc-btn btn-cyan" onclick="add('.')">.</button>
+    <button class="calc-btn btn-equal" onclick="calc()">=</button>
+  </div>
+</div>
+
+<script>
+let display = document.getElementById('calc-result');
+let current = '';
+
+function update(){
+  display.textContent = current || '0';
+}
+function add(v){
+  if(current.length > 16) return;
+  if(current === 'Error') current = '';
+  current += v;
+  update();
+}
+function ac(){
+  current = '';
+  update();
+}
+function del(){
+  current = current.slice(0,-1);
+  update();
+}
+function calc(){
+  try{
+    if(!current) return;
+    let exp = current.replace(/%/g,'/100');
+    let res = Function('"use strict"; return ('+exp+')')();
+    if(!isFinite(res)) throw new Error();
+    if(res.toString().length > 10) res = parseFloat(res.toFixed(8));
+    current = res.toString();
+    update();
+  }catch(e){
+    current='Error';
+    update();
+    setTimeout(()=>{current='';update();},900);
+  }
+}
+update();
+
+// Soporte teclado
+document.addEventListener('keydown', (e)=>{
+  if((e.key>='0' && e.key<='9') || ['+','-','*','/','%','.'].includes(e.key)) add(e.key);
+  if(e.key==='Enter' || e.key==='=') calc();
+  if(e.key==='Backspace') del();
+  if(e.key.toLowerCase()==='c' || e.key==='Escape') ac();
+});
+</script>
+
+</body>
+</html>
